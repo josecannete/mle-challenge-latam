@@ -8,6 +8,14 @@ from sklearn.linear_model import LogisticRegression
 
 
 def get_minutes_diff(data: pd.DataFrame) -> int:
+    """Calculate the difference in minutes between 'Fecha-O' and 'Fecha-I' columns.
+
+    Args:
+        data (pd.DataFrame): DataFrame with 'Fecha-O' and 'Fecha-I' columns.
+
+    Returns:
+        int: difference in minutes.
+    """
     fecha_o = datetime.strptime(data["Fecha-O"], "%Y-%m-%d %H:%M:%S")
     fecha_i = datetime.strptime(data["Fecha-I"], "%Y-%m-%d %H:%M:%S")
     minutes_diff = ((fecha_o - fecha_i).total_seconds()) / 60
@@ -32,12 +40,24 @@ class DelayModel:
     def __init__(self):
         self._model = LogisticRegression(class_weight="balanced")
 
-    def _add_delay_column(self, data: pd.DataFrame) -> pd.DataFrame:
-        data["delay"] = data.apply(lambda x: get_minutes_diff(x), axis=1)
-        data["delay"] = data["delay"].apply(
+    def _create_delay_dataframe(
+        self, data: pd.DataFrame, target_column_name: str
+    ) -> pd.DataFrame:
+        """Create a DataFrame with the target column.
+
+        Args:
+            data (pd.DataFrame): DataFrame with 'Fecha-O' and 'Fecha-I' columns.
+            target_column_name (str): name of the target column.
+
+        Returns:
+            pd.DataFrame: DataFrame with the target column.
+        """
+        delay_df = pd.DataFrame()
+        delay_df[target_column_name] = data.apply(lambda x: get_minutes_diff(x), axis=1)
+        delay_df[target_column_name] = delay_df[target_column_name].apply(
             lambda x: 1 if x > self._DELAY_THRESHOLD else 0
         )
-        return data
+        return delay_df
 
     def preprocess(
         self, data: pd.DataFrame, target_column: str = None
@@ -67,8 +87,8 @@ class DelayModel:
         selected_features = features[self._FEATURE_COLS]
 
         if target_column:
-            target = self._add_delay_column(data)
-            return selected_features, target[[target_column]]
+            target = self._create_delay_dataframe(data, target_column)
+            return selected_features, target
 
         return selected_features
 
@@ -80,7 +100,6 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
             target (pd.DataFrame): target.
         """
-        # TODO: incorporate class weights
         self._model.fit(features, target)
         return
 
