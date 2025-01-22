@@ -1,6 +1,6 @@
 import pandas as pd
 
-from typing import Tuple, Union, List
+from typing import Tuple, Union
 
 from datetime import datetime
 
@@ -30,7 +30,7 @@ class DelayModel:
     _DELAY_THRESHOLD: int = 15
 
     def __init__(self):
-        self._model = LogisticRegression()
+        self._model = LogisticRegression(class_weight="balanced")
 
     def _add_delay_column(self, data: pd.DataFrame) -> pd.DataFrame:
         data["delay"] = data.apply(lambda x: get_minutes_diff(x), axis=1)
@@ -84,7 +84,7 @@ class DelayModel:
         self._model.fit(features, target)
         return
 
-    def predict(self, features: pd.DataFrame) -> List[int]:
+    def predict(self, features: pd.DataFrame) -> list[int]:
         """
         Predict delays for new flights.
 
@@ -92,6 +92,6 @@ class DelayModel:
             features (pd.DataFrame): preprocessed data.
 
         Returns:
-            (List[int]): predicted targets.
+            (list[int]): predicted targets.
         """
         return self._model.predict(features)
