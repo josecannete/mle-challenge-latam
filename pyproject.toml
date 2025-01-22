@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling", "hatch-requirements-txt"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mle-challenge-latam"
+version = "2025.0.0"
+# dependencies = [
+#   "httpx",
+#   "gidgethub[httpx]>4.0.0",
+#   "django>2.1; os_name != 'nt'",
+#   "django>2.0; os_name == 'nt'",
+# ]
+requires-python = ">=3.13"
+authors = [
+  {name = "José Cañete", email = "josecannete@gmail.com"},
+]
+maintainers = [
+  {name = "José Cañete", email = "josecannete@gmail.com"},
+]
+description = "My implementation of the MLE Challenge to apply to LATAM."
+readme = "README.md"
+# license = "MIT"
+# license-files = ["LICEN[CS]E.*"]
+# keywords = ["egg", "bacon", "sausage", "tomatoes", "Lobster Thermidor"]
+classifiers = [
+  "Programming Language :: Python"
+]
+
+# [project.optional-dependencies]
+# gui = ["PyQt5"]
+# cli = [
+#   "rich",
+#   "click",
+# ]
+
+dynamic = ["dependencies", "optional-dependencies"]
+
+[tool.hatch.metadata.hooks.requirements_txt]
+files = ["requirements.txt"]
+
+[tool.hatch.metadata.hooks.requirements_txt.optional-dependencies]
+dev = ["requirements-dev.txt"]
+test = ["requirements-test.txt"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["challenge"]
+
+[project.urls]
+# Homepage = "https://example.com"
+# Documentation = "https://readthedocs.org"
+Repository = "https://github.com/josecannete/mle-challenge-latam.git"
+# "Bug Tracker" = "https://github.com/me/spam/issues"
+# Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
+
+# [project.scripts]
+# spam-cli = "spam:main_cli"
+
+# [project.gui-scripts]
+# spam-gui = "spam:main_gui"
+
+# [project.entry-points."spam.magical"]
+# tomatoes = "spam:main_tomatoes"
+
+[tool.ruff]
+line-length = 88
