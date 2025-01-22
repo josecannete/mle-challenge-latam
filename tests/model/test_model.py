@@ -1,6 +1,8 @@
+from pathlib import Path
 import unittest
 import pandas as pd
 
+import sklearn
 from sklearn.metrics import classification_report
 from sklearn.model_selection import train_test_split
 from challenge.model import DelayModel
@@ -68,6 +70,11 @@ class TestModel(unittest.TestCase):
     def test_model_predict(self):
         features = self.model.preprocess(data=self.data)
 
+        with self.assertRaises(sklearn.exceptions.NotFittedError):
+            self.model.predict(features=features)
+
+        self.model.load_model("trained_model.joblib")
+
         predicted_targets = self.model.predict(features=features)
 
         assert isinstance(predicted_targets, list)
@@ -75,3 +82,10 @@ class TestModel(unittest.TestCase):
         assert all(
             isinstance(predicted_target, int) for predicted_target in predicted_targets
         )
+
+    def test_model_save(self):
+        self.model.save_model("test_model.joblib")
+
+        assert Path("test_model.joblib").exists()
+
+        Path("test_model.joblib").unlink()

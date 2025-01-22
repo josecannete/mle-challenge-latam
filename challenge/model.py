@@ -1,3 +1,4 @@
+import joblib
 import pandas as pd
 
 from typing import Tuple, Union
@@ -59,6 +60,24 @@ class DelayModel:
         )
         return delay_df
 
+    def save_model(self, path: str) -> None:
+        """
+        Save model to disk.
+
+        Args:
+            path (str): path to save the model.
+        """
+        joblib.dump(self._model, path)
+
+    def load_model(self, path: str) -> None:
+        """
+        Load model from disk.
+
+        Args:
+            path (str): path to load the model.
+        """
+        self._model = joblib.load(path)
+
     def preprocess(
         self, data: pd.DataFrame, target_column: str = None
     ) -> Union[Tuple[pd.DataFrame, pd.DataFrame], pd.DataFrame]:
@@ -113,4 +132,4 @@ class DelayModel:
         Returns:
             (list[int]): predicted targets.
         """
-        return self._model.predict(features)
+        return self._model.predict(features).tolist()
