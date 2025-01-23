@@ -1,4 +1,4 @@
-name: "Continuous Delivery"
+name: "Continuous Delivery (Vertex Model Registry + Endpoint)"
 
 on:
   push:
@@ -7,10 +7,9 @@ on:
 
 env:
   PROJECT_ID: latam-challenge-448714
-  GAR_LOCATION: us-central1
+  LOCATION: us-central1
   GAR_REPO: latam-images
   APP: delay-model
-  VERTEX_ENDPOINT_ID: 7896596853175615488
 
 jobs:
   deploy:
@@ -34,53 +33,33 @@ jobs:
 
       - name: "Docker auth"
         run: |-
-          gcloud auth configure-docker ${{ env.GAR_LOCATION }}-docker.pkg.dev
+          gcloud auth configure-docker ${{ env.LOCATION }}-docker.pkg.dev
 
-      # - name: "Pull latest image"
-      #   run: >
-      #     docker pull
-      #     "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:latest"
-
-      # - name: "Build image"
-      #   run: >
-      #     docker build 
-      #     -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
-      #     -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:latest"
-      #     --cache-from "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:latest"
-      #     .
-
-      # - name: "Push image"
-      #   run: >
-      #     docker push 
-      #     "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}"
-      #     --all-tags
-
-
-      - name: 'Build and push container'
+      - name: "Build and push container"
         run: |-
-          docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" .
-          docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
+          docker build -t "${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" .
+          docker push "${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
 
       - name: "Upload model"
         run: >
           gcloud ai models upload
-          --region=us-central1
+          --region=${{ env.LOCATION }}
           --display-name=${{ env.APP }} 
-          --container-image-uri="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" 
+          --container-image-uri="${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" 
           --container-health-route /health 
           --container-predict-route /predict 
-          --model-id delay-model 
-          --parent-model projects/latam-challenge-448714/locations/us-central1/models/delay-model 
+          --model-id ${{ env.APP }}
+          --parent-model projects/${{ env.PROJECT_ID }}/locations/${{ env.LOCATION }}/models/${{ env.APP }}
           --version-aliases default
 
       - name: "Deploy model"
         run: >
           gcloud ai endpoints deploy-model 
-          delay-model-endpoint 
-          --project="latam-challenge-448714" 
-          --region=us-central1 
-          --model=delay-model 
-          --display-name=delay-model-deployed
+          ${{ env.APP }}-endpoint 
+          --project=${{ env.PROJECT_ID }}
+          --region=${{ env.LOCATION }}
+          --model=${{ env.APP }} 
+          --display-name=${{ env.APP }}-deployed
           --min-replica-count=1
           --max-replica-count=2
           --traffic-split=0=100
