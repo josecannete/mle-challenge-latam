@@ -40,3 +40,7 @@ jobs:
           run: |-
             docker build -t "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" .
             docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
+
+        - name: 'Deploy model'
+          run: gcloud ai models upload -region=us-central1 --display-name=${{ env.APP }} --artifact-uri="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
+
