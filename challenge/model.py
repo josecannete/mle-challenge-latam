@@ -94,6 +94,10 @@ class DelayModel:
             pd.DataFrame: features.
         """
 
+        selected_features = pd.DataFrame(
+            columns=self._FEATURE_COLS, dtype=int, index=data.index
+        )
+
         features = pd.concat(
             [
                 pd.get_dummies(data["OPERA"], prefix="OPERA"),
@@ -103,7 +107,10 @@ class DelayModel:
             axis=1,
         )
 
-        selected_features = features[self._FEATURE_COLS]
+        present_features = list(set(features.columns) & set(self._FEATURE_COLS))
+
+        selected_features[present_features] = features[present_features]
+        selected_features.fillna(0, inplace=True)
 
         if target_column:
             target = self._create_delay_dataframe(data, target_column)
