@@ -19,6 +19,21 @@ class TestBatchPipeline(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"predict": [0]})
 
+    def test_should_get_predict_for_multiple_examples(self):
+        data = {
+            "flights": [
+                {"OPERA": "Aerolineas Argentinas", "TIPOVUELO": "N", "MES": 1},
+                {"OPERA": "Grupo LATAM", "TIPOVUELO": "N", "MES": 2},
+                {"OPERA": "Sky Airline", "TIPOVUELO": "I", "MES": 3},
+                {"OPERA": "Copa Air", "TIPOVUELO": "I", "MES": 4},
+            ]
+        }
+
+        with self.client:
+            response = self.client.post("/predict", json=data)
+
+        self.assertEqual(response.status_code, 200)
+
     def test_should_failed_empty_data(self):
         data = {"flights": []}
         with self.client:
