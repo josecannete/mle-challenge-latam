@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: latam-challenge-448714
-  GAR_LOCATION: us-centrail1
+  GAR_LOCATION: us-central1
   GAR_REPO: latam-images
   APP: delay-model
 #   REGION: YOUR_APP_REGION # TODO: update Cloud Run service region
