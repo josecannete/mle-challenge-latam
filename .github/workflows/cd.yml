@@ -10,7 +10,6 @@ env:
   GAR_LOCATION: us-central1
   GAR_REPO: latam-images
   APP: delay-model
-  VERTEX_ENDPOINT_ID: 7896596853175615488
 
 jobs:
   deploy:
