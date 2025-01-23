@@ -43,7 +43,7 @@ class Flight(BaseModel):
 
 
 class BatchPredictionQuery(BaseModel):
-    flights: list[Flight] = Field(min_items=1)
+    flights: list[Flight] = Field(min_length=1)
 
 
 @app.get("/health", status_code=200)
