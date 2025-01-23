@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from challenge.model import DelayModel
 from challenge.constants import _VALID_OPERA_VALUES
 
-delay_model = None
+delay_model: DelayModel = None
 
 
 @asynccontextmanager
@@ -47,12 +47,12 @@ class BatchPredictionQuery(BaseModel):
 
 
 @app.get("/health", status_code=200)
-async def get_health() -> dict:
+async def get_health() -> dict[str, str]:
     return {"status": "OK"}
 
 
 @app.post("/predict", status_code=200)
-async def post_predict(query: BatchPredictionQuery) -> dict:
+async def post_predict(query: BatchPredictionQuery) -> dict[str, list[int]]:
     data_df = pd.DataFrame.from_records(
         [flight.model_dump() for flight in query.flights]
     )

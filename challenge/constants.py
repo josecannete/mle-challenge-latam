@@ -1,4 +1,4 @@
-_VALID_OPERA_VALUES = [
+_VALID_OPERA_VALUES: list[str] = [
     "American Airlines",
     "Air Canada",
     "Air France",
