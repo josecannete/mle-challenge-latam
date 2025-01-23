@@ -42,7 +42,7 @@ jobs:
             docker push "${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
 
         - name: 'Upload model'
-          run: gcloud ai models upload --region=us-central1 --display-name=${{ env.APP }} --container-image-uri="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" --model-id delay-model --parent-model projects/latam-challenge-448714/locations/us-central1/models/delay-model --version-aliases default
+          run: gcloud ai models upload --region=us-central1 --display-name=${{ env.APP }} --container-image-uri="${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" --container-health-route /health --container-predict-route /predict --model-id delay-model --parent-model projects/latam-challenge-448714/locations/us-central1/models/delay-model --version-aliases default
 
         - name: 'Deploy model'
           run: gcloud ai endpoints deploy-model delay-model-endpoint --project="latam-challenge-448714" --region=us-central1 --model=delay-model --display-name=delay-model-deployed
