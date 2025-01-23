@@ -19,6 +19,13 @@ class TestBatchPipeline(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {"predict": [0]})
 
+    def test_should_failed_empty_data(self):
+        data = {"flights": []}
+        with self.client:
+            response = self.client.post("/predict", json=data)
+
+        self.assertEqual(response.status_code, 400)
+
     def test_should_failed_unkown_column_1(self):
         data = {
             "flights": [{"OPERA": "Aerolineas Argentinas", "TIPOVUELO": "N", "MES": 13}]
