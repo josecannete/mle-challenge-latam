@@ -12,7 +12,7 @@ jobs:
           python-version: 3.13
       - uses: pre-commit/action@v3.0.1
 
-  model-tests:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +23,4 @@ jobs:
       - run: pip install pytest
       - run: pip install .
       - run: pytest tests/model
+      - run: pytest tests/api
