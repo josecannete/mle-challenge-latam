@@ -27,6 +27,14 @@ jobs:
             project_id: '${{ env.PROJECT_ID }}'
             workload_identity_provider: 'projects/831127518569/locations/global/workloadIdentityPools/github/providers/my-repo'
 
+        - name: 'Set up Cloud SDK'
+          uses: 'google-github-actions/setup-gcloud@v2'
+          with:
+            version: '>= 363.0.0'
+
+        - name: 'Use gcloud CLI'
+          run: 'gcloud info'
+
       # - name: 'Set up Cloud SDK'
       #   uses: 'google-github-actions/setup-gcloud@v1'
       #   with:
