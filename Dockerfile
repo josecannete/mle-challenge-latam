@@ -10,4 +10,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 RUN pip install --no-cache-dir .
 
-CMD ["fastapi", "run", "challenge/api.py"]
+CMD ["fastapi", "run", "--port", "8080", "challenge/api.py"]
