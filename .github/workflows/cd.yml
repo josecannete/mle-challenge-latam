@@ -1,0 +1,65 @@
+name: "Continuous Delivery (Vertex Model Registry + Endpoint)"
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  PROJECT_ID: latam-challenge-448714
+  LOCATION: us-central1
+  GAR_REPO: latam-images
+  APP: delay-model
+
+jobs:
+  deploy:
+    # Add 'id-token' with the intended permissions for workload identity federation
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: "actions/checkout@v4"
+
+      - uses: "google-github-actions/auth@v2"
+        with:
+          project_id: "${{ env.PROJECT_ID }}"
+          workload_identity_provider: "projects/831127518569/locations/global/workloadIdentityPools/github/providers/my-repo"
+
+      - uses: "google-github-actions/setup-gcloud@v2"
+        with:
+          version: ">= 363.0.0"
+
+      - name: "Docker auth"
+        run: |-
+          gcloud auth configure-docker ${{ env.LOCATION }}-docker.pkg.dev
+
+      - name: "Build and push container"
+        run: |-
+          docker build -t "${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" .
+          docker push "${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}"
+
+      - name: "Upload model"
+        run: >
+          gcloud ai models upload
+          --region=${{ env.LOCATION }}
+          --display-name=${{ env.APP }} 
+          --container-image-uri="${{ env.LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/${{ env.APP }}:${{ github.sha }}" 
+          --container-health-route /health 
+          --container-predict-route /predict 
+          --model-id ${{ env.APP }}
+          --parent-model projects/${{ env.PROJECT_ID }}/locations/${{ env.LOCATION }}/models/${{ env.APP }}
+          --version-aliases default
+
+      - name: "Deploy model"
+        run: >
+          gcloud ai endpoints deploy-model 
+          ${{ env.APP }}-endpoint 
+          --project=${{ env.PROJECT_ID }}
+          --region=${{ env.LOCATION }}
+          --model=${{ env.APP }} 
+          --display-name=${{ env.APP }}-deployed
+          --min-replica-count=1
+          --max-replica-count=2
+          --traffic-split=0=100
