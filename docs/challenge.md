@@ -1,4 +1,4 @@
-# LATAM Challenge
+# LATAM Challenge
 
 ## Installation
 
@@ -38,7 +38,7 @@ In the future I would like to:
 
 Two different mechanisms of Continuous Delivery were implemented. 
 
-### Vertex AI Model Registry + Endpoints
+### Vertex AI Model Registry + Endpoints
 
 My first idea was to use Model Registry + Endpoints. It is suitable for machine learning in general due to its monitoring features, evaluation, among others.
 
@@ -52,6 +52,6 @@ A problem with this implementation (for the case of this challenge) is that ther
 That makes it difficult to share with you for the purpose of this challenge. I left the cd workflow [here](https://github.com/josecannete/mle-challenge-latam/blob/main/.github/workflows/cd.yml) as I find it valuable, but implemented a simpler one with Cloud Run.
 
 
-### Cloud Run
+### Cloud Run
 
 This one deploys the model to Cloud Run, it is very simple and can be seen [here](https://github.com/josecannete/mle-challenge-latam/blob/main/.github/workflows/cd-cloudrun.yml). This is the one enabled in the repo. The URL in the makefile is deployed using this mechanism.
