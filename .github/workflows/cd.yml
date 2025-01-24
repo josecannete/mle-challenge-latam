@@ -3,7 +3,7 @@ name: "Continuous Delivery (Vertex Model Registry + Endpoint)"
 on:
   push:
     branches:
-      - feature/deploy
+      - main
 
 env:
   PROJECT_ID: latam-challenge-448714
